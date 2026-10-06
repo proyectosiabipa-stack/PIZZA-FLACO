@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>P&amp;R Flaco's Menú</title>
+<meta name="description" content="Menú digital de P&R Flaco's: pizzas, pastas, entradas, carnes, platos nuevos y bebidas.">
+<meta name="theme-color" content="#151413">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;1,700;1,800;1,900&family=Figtree:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500&display=swap">
+<style>
+/* Layout: one narrow chalkboard column (mobile-first), sticky brand bar + category rail, cards on slate; 2-up grid on wide screens. Single dark look by design (the brand is a chalkboard). */
+:root {
+  --slate: #151413;        /* chalkboard ground, warm-biased near-black */
+  --slate-2: #1d1b19;      /* raised card */
+  --slate-3: #282522;      /* chips, inputs */
+  --chalk: #efe9df;        /* chalk white text */
+  --chalk-dim: #a49c91;    /* ingredients, secondary */
+  --line: rgba(239,233,223,.11);
+  --ember: #f2873a;        /* brand orange (price discs on the printed menu) */
+  --ember-deep: #d9672a;
+  --yolk: #f7c522;         /* brand yellow ("P&R FLACO'S") */
+  --ink-on-ember: #1a1008;
+  --f-display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --f-body: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --r: 14px;
+  --gutter: 16px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 128px; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
+body {
+  margin: 0;
+  background-color: var(--slate);
+  background-image:
+    radial-gradient(1200px 500px at 50% -120px, rgba(242,135,58,.10), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .055 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color: var(--chalk);
+  font: 400 15px/1.5 var(--f-body);
+  -webkit-font-smoothing: antialiased;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
+.wrap { max-width: 980px; margin: 0 auto; padding-inline: var(--gutter); }
+
+/* ---------- Top bar ---------- */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30;
+  background: rgba(21,20,19,.86);
+  -webkit-backdrop-filter: saturate(140%) blur(14px); backdrop-filter: saturate(140%) blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.bar-row { display: flex; align-items: center; gap: 12px; height: 58px; }
+.brand { display: flex; align-items: baseline; gap: 6px; text-decoration: none; color: var(--yolk); margin-right: auto; min-width: 0; }
+.brand b { font: italic 900 25px/1 var(--f-display); letter-spacing: .01em; white-space: nowrap; }
+.brand span { font: 600 11px/1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: var(--chalk-dim); white-space: nowrap; }
+.search {
+  position: relative; flex: 0 1 260px; min-width: 120px;
+}
+.search input {
+  width: 100%; height: 38px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--slate-3); padding: 0 34px 0 36px; font-size: 14px; outline: none;
+  transition: border-color .2s, background .2s;
+}
+.search input::placeholder { color: var(--chalk-dim); }
+.search input:focus { border-color: var(--ember); background: #2e2a26; }
+.search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; stroke: var(--chalk-dim); pointer-events: none; }
+.search .clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; border: 0; background: transparent; color: var(--chalk-dim); font-size: 18px; line-height: 1; }
+
+/* Category rail */
+.rail { display: flex; gap: 8px; overflow-x: auto; padding: 0 var(--gutter) 12px; margin: 0 calc(var(--gutter) * -1); scrollbar-width: none; scroll-snap-type: x proximity; }
+.rail::-webkit-scrollbar { display: none; }
+.rail a {
+  flex: none; scroll-snap-align: start; display: inline-flex; align-items: center; gap: 7px;
+  height: 36px; padding: 0 14px; border-radius: 999px; text-decoration: none;
+  font: 700 15px/1 var(--f-display); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--chalk-dim); background: var(--slate-2); border: 1px solid var(--line);
+  transition: color .2s, background .2s, border-color .2s;
+}
+.rail a svg { width: 17px; height: 17px; }
+.rail a[aria-current="true"] { color: var(--ink-on-ember); background: var(--ember); border-color: var(--ember); }
+
+/* ---------- Hero ---------- */
+.hero { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 8px 20px; padding-block: 28px 8px; }
+.eyebrow { font: 700 12px/1 var(--f-body); letter-spacing: .22em; text-transform: uppercase; color: var(--yolk); }
+.hero h1 {
+  margin: 10px 0 6px; font: italic 900 clamp(64px, 19vw, 132px)/.82 var(--f-display); letter-spacing: -.01em; text-transform: uppercase;
+  color: var(--chalk);
+  text-shadow: 0 0 1px rgba(239,233,223,.4);
+  background: linear-gradient(180deg, #fffaf2 0%, #d9d1c4 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero p { margin: 0; max-width: 34ch; color: var(--chalk-dim); font: italic 400 17px/1.4 var(--f-serif); }
+.hero-art { width: clamp(112px, 30vw, 220px); aspect-ratio: 1; max-width: 100%; }
+.hero-art svg { width: 100%; height: 100%; animation: spin 90s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.facts { display: flex; flex-wrap: wrap; gap: 8px; padding-block: 18px 6px; }
+.fact { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; background: var(--slate-2); border: 1px solid var(--line); font-size: 13px; color: var(--chalk-dim); }
+.fact strong { color: var(--chalk); font-weight: 600; }
+.fact i { width: 8px; height: 8px; border-radius: 50%; background: var(--ember); flex: none; }
+
+/* Featured */
+.feature {
+  margin-top: 18px; position: relative; overflow: hidden; border-radius: 20px; padding: 22px 20px;
+  background: linear-gradient(120deg, #2a1a0f 0%, #1d1b19 62%);
+  border: 1px solid rgba(242,135,58,.35);
+  display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 14px; align-items: end;
+}
+.feature::after { content: ""; position: absolute; right: -60px; top: -60px; width: 200px; height: 200px; border-radius: 50%; border: 2px dashed rgba(247,197,34,.25); pointer-events: none; }
+.feature.has3d { padding: 0; grid-template-columns: 1fr; gap: 0; align-items: stretch; }
+.feature.has3d::after { display: none; }
+.f3d { position: relative; aspect-ratio: 4 / 3; background: #0f0e0d; overflow: hidden; cursor: grab; touch-action: pan-y; }
+.f3d canvas, .f3d img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+.f3d::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(21,20,19,0) 55%, rgba(29,27,25,.96) 100%); }
+.f3d .b3d { position: absolute; left: 14px; top: 14px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px 0 8px; border-radius: 999px; background: rgba(21,20,19,.6); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgba(247,197,34,.45); color: var(--yolk); font: 700 12px/1 var(--f-display); letter-spacing: .12em; text-transform: uppercase; }
+.f3d .b3d svg { width: 15px; height: 15px; animation: cube 6s linear infinite; }
+.f-body { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 14px; align-items: end; padding: 0 20px 22px; margin-top: -54px; }
+.feature .tag { font: 700 11px/1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: var(--yolk); }
+.feature h2 { margin: 8px 0 6px; font: italic 900 38px/.95 var(--f-display); text-transform: uppercase; text-wrap: balance; }
+.feature p { margin: 0; color: var(--chalk-dim); font-size: 14px; max-width: 46ch; }
+.feature .from { text-align: right; }
+.feature .from small { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--chalk-dim); }
+.feature .from b { font: 800 34px/1 var(--f-display); color: var(--ember); font-variant-numeric: tabular-nums; }
+.feature a { position: relative; z-index: 1; grid-column: 1 / -1; justify-self: start; display: inline-flex; align-items: center; gap: 6px; color: var(--yolk); font-weight: 600; font-size: 14px; text-decoration: none; }
+
+/* ---------- Sections ---------- */
+section.cat { padding-block: 36px 4px; }
+.cat-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-bottom: 14px; border-bottom: 1px dashed rgba(239,233,223,.18); margin-bottom: 14px; }
+.cat-head h2 { margin: 0; display: flex; align-items: center; gap: 12px; font: italic 900 44px/.9 var(--f-display); text-transform: uppercase; letter-spacing: .005em; }
+.cat-head h2 svg { width: 34px; height: 34px; flex: none; }
+.cat-head .note { color: var(--chalk-dim); font: italic 400 15px/1.3 var(--f-serif); }
+
+/* Size switch (pizzas) */
+.sizes { display: flex; gap: 4px; padding: 4px; background: var(--slate-3); border-radius: 999px; border: 1px solid var(--line); width: 100%; max-width: 420px; }
+.sizes button {
+  flex: 1 1 0; min-width: 0; border: 0; background: transparent; border-radius: 999px; padding: 8px 4px;
+  font: 700 14px/1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; color: var(--chalk-dim);
+  transition: background .2s, color .2s;
+}
+.sizes button[aria-pressed="true"] { background: var(--ember); color: var(--ink-on-ember); }
+.size-wrap { width: 100%; display: grid; gap: 6px; }
+.size-wrap small { color: var(--chalk-dim); font-size: 12px; }
+
+.grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 760px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+.item {
+  position: relative; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 6px 14px;
+  padding: 16px 16px 14px; border-radius: var(--r); background: var(--slate-2); border: 1px solid var(--line);
+  transition: border-color .2s, transform .2s;
+}
+.item:hover { border-color: rgba(242,135,58,.35); }
+.item .ph { grid-column: 1 / -1; position: relative; display: block; width: calc(100% + 32px); padding: 0; border: 0; margin: -16px -16px 6px; border-radius: var(--r) var(--r) 0 0; overflow: hidden; aspect-ratio: 5 / 4; background: #0f0e0d; transform: translateZ(0); }
+.ph img { width: 100%; height: 100%; object-fit: cover; display: block; transform: translate3d(0, calc(var(--p, 0) * -4.5%), 0) scale(1.1); will-change: transform; opacity: 0; transition: opacity .6s ease, filter .6s ease; filter: blur(8px); }
+.ph img.ok { opacity: 1; filter: none; }
+.ph::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 70% at calc(50% + var(--p, 0) * 30%) -10%, rgba(255,214,160,.16), transparent 55%), linear-gradient(180deg, transparent 62%, rgba(21,20,19,.55)); }
+.ph .cap { position: absolute; right: 8px; bottom: 8px; z-index: 1; padding: 3px 7px; border-radius: 6px; background: rgba(21,20,19,.7); color: var(--chalk-dim); font-size: 10px; letter-spacing: .04em; }
+.ph .b3d { position: absolute; left: 10px; bottom: 10px; z-index: 1; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px 0 8px; border-radius: 999px; background: rgba(21,20,19,.72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgba(247,197,34,.45); color: var(--yolk); font: 700 13px/1 var(--f-display); letter-spacing: .1em; text-transform: uppercase; transition: background .2s, color .2s; }
+.ph .b3d svg { width: 16px; height: 16px; animation: cube 6s linear infinite; }
+@keyframes cube { to { transform: rotate(360deg); } }
+.ph:hover .b3d, .ph:focus-visible .b3d { background: var(--yolk); color: #1b1503; }
+/* Reveal on scroll: cards rise in with a slight 3D tilt */
+.js-reveal .item, .js-reveal .dtile { opacity: 0; transform: perspective(900px) translate3d(0, 34px, 0) rotateX(9deg); transform-origin: 50% 100%; }
+.js-reveal .item.in, .js-reveal .dtile.in { opacity: 1; transform: none; transition: opacity .7s ease, transform .9s cubic-bezier(.16,.84,.24,1), border-color .2s; }
+.item .title { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.item .num { font: 700 14px/1 var(--f-display); color: var(--ember); font-variant-numeric: tabular-nums; flex: none; }
+.item h3 { margin: 0; font: 700 23px/1.02 var(--f-display); text-transform: uppercase; letter-spacing: .015em; text-wrap: balance; min-width: 0; }
+.item .badge { display: inline-block; margin-left: 2px; padding: 3px 7px; border-radius: 6px; background: var(--yolk); color: #1b1503; font: 700 10px/1 var(--f-body); letter-spacing: .12em; text-transform: uppercase; vertical-align: 3px; }
+.item p { grid-column: 1 / -1; margin: 0; color: var(--chalk-dim); font-size: 14px; line-height: 1.5; }
+.item .price { font: 800 26px/1 var(--f-display); color: var(--ember); font-variant-numeric: tabular-nums; white-space: nowrap; align-self: start; }
+.item .price sup { font-size: .55em; vertical-align: .55em; margin-right: 1px; }
+.item .foot { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+.flag { grid-column: 1 / -1; font-size: 12px; color: var(--yolk); display: flex; gap: 6px; align-items: flex-start; }
+
+.chips { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; flex: 1 1 260px; min-width: 0; }
+.chips.two { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.chip {
+  border: 1px solid var(--line); background: var(--slate-3); border-radius: 10px; padding: 7px 4px 6px; text-align: center; min-width: 0;
+  transition: background .2s, border-color .2s, color .2s;
+}
+.chip small { display: block; font: 600 10px/1 var(--f-body); letter-spacing: .12em; text-transform: uppercase; color: var(--chalk-dim); margin-bottom: 4px; }
+.chip b { display: block; font: 700 18px/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { background: var(--ember); border-color: var(--ember); color: var(--ink-on-ember); }
+.chip[aria-pressed="true"] small { color: rgba(26,16,8,.75); }
+
+.add {
+  margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px 0 10px; border-radius: 999px;
+  border: 1px solid rgba(242,135,58,.5); background: transparent; color: var(--ember); font-weight: 600; font-size: 13px;
+  transition: background .2s, color .2s;
+}
+.add svg { width: 16px; height: 16px; }
+.add:hover { background: rgba(242,135,58,.12); }
+.add.done { background: var(--ember); color: var(--ink-on-ember); }
+.foot .chips + .add { width: 44px; height: 44px; padding: 0; justify-content: center; margin-left: 0; }
+.foot .chips + .add span { display: none; }
+@media (max-width: 480px) { .brand span { display: none; } }
+
+/* Drinks: photo tiles */
+.dgrid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+@media (min-width: 620px) { .dgrid { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+@media (min-width: 860px) { .dgrid { grid-template-columns: repeat(4, minmax(0,1fr)); } }
+.dtile { position: relative; display: flex; flex-direction: column; border-radius: var(--r); background: var(--slate-2); border: 1px solid var(--line); overflow: hidden; min-width: 0; }
+.dtile .ph { aspect-ratio: 1; width: 100%; padding: 0; border: 0; position: relative; overflow: hidden; background: #0f0e0d; display: block; }
+.dtile .ph .cap { display: none; }
+.dtile .ph .b3d { height: 26px; font-size: 12px; left: 8px; bottom: 8px; padding: 0 9px 0 7px; }
+.dtile .row { display: flex; align-items: center; gap: 8px; padding: 10px 10px 11px 12px; }
+.dtile .row div { min-width: 0; margin-right: auto; }
+.dtile .row span { display: block; font: 700 17px/1.05 var(--f-display); text-transform: uppercase; letter-spacing: .03em; }
+.dtile .row b { display: block; margin-top: 3px; font: 800 20px/1 var(--f-display); color: var(--ember); font-variant-numeric: tabular-nums; }
+.dtile .mini-add { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(242,135,58,.5); background: transparent; color: var(--ember); display: grid; place-items: center; transition: background .2s, color .2s; }
+.dtile .mini-add svg { width: 15px; height: 15px; }
+.dtile .mini-add.done { background: var(--ember); color: var(--ink-on-ember); }
+/* (legacy) compact drink list */
+.drinks { display: grid; grid-template-columns: 1fr; gap: 0 28px; background: var(--slate-2); border: 1px solid var(--line); border-radius: var(--r); padding: 6px 16px; }
+@media (min-width: 620px) { .drinks { grid-template-columns: 1fr 1fr; } }
+.drink { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px dashed rgba(239,233,223,.12); min-width: 0; }
+.drink span { font: 700 19px/1.1 var(--f-display); text-transform: uppercase; letter-spacing: .03em; min-width: 0; }
+.drink .dots { flex: 1; border-bottom: 2px dotted rgba(239,233,223,.18); transform: translateY(-4px); min-width: 12px; }
+.drink b { font: 800 21px/1 var(--f-display); color: var(--ember); font-variant-numeric: tabular-nums; }
+.drink .mini-add { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 1px solid rgba(242,135,58,.5); background: transparent; color: var(--ember); display: grid; place-items: center; }
+.drink .mini-add svg { width: 14px; height: 14px; }
+.drink .mini-add.done { background: var(--ember); color: var(--ink-on-ember); }
+
+/* ---------- 3D viewer ---------- */
+.viewer { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: calc(56px + env(safe-area-inset-top, 0px)) 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  background: radial-gradient(90% 60% at 50% 38%, #2a1a0f 0%, #121110 62%, #0b0a09 100%); opacity: 0; transition: opacity .35s ease; overscroll-behavior: contain; }
+.viewer[hidden] { display: none; }
+.viewer.open { opacity: 1; }
+.v-stage { position: relative; width: min(100%, 62vh, 620px); aspect-ratio: 1; flex: none; cursor: grab; touch-action: none; transform: perspective(1100px) rotateX(16deg) scale(.86) translateY(30px); opacity: 0; transition: transform .8s cubic-bezier(.16,.84,.24,1), opacity .5s ease; }
+.viewer.open .v-stage { transform: none; opacity: 1; }
+.v-stage:active { cursor: grabbing; }
+.v-stage canvas, .v-stage img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; border-radius: 26px;
+  -webkit-mask-image: radial-gradient(closest-side, #000 82%, transparent 100%); mask-image: radial-gradient(closest-side, #000 82%, transparent 100%); }
+.v-stage::after { content: ""; position: absolute; left: 12%; right: 12%; bottom: -4%; height: 10%; border-radius: 50%; background: radial-gradient(closest-side, rgba(242,135,58,.28), transparent); filter: blur(8px); z-index: -1; }
+.v-load { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; transition: opacity .3s; }
+.v-load i { width: 38px; height: 38px; border-radius: 50%; border: 3px solid rgba(247,197,34,.2); border-top-color: var(--yolk); animation: spin .8s linear infinite; }
+.v-load.off { opacity: 0; }
+.v-top { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); left: 12px; right: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.v-top .count { font: 700 13px/1 var(--f-display); letter-spacing: .16em; text-transform: uppercase; color: var(--chalk-dim); }
+.v-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: rgba(40,37,34,.75); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); display: grid; place-items: center; font-size: 22px; line-height: 1; transition: background .2s, transform .2s; }
+.v-btn:hover { background: rgba(60,55,50,.9); }
+.v-btn:active { transform: scale(.94); }
+.v-btn svg { width: 20px; height: 20px; }
+.v-info { width: min(100%, 560px); text-align: center; transition: opacity .35s ease, transform .5s cubic-bezier(.16,.84,.24,1); }
+.v-info.swap { opacity: 0; transform: translateY(10px); }
+.v-cat { font: 700 11px/1 var(--f-body); letter-spacing: .22em; text-transform: uppercase; color: var(--yolk); }
+.v-info h2 { margin: 8px 0 4px; font: italic 900 clamp(30px, 8vw, 44px)/.95 var(--f-display); text-transform: uppercase; text-wrap: balance; }
+.v-info p { margin: 0 auto; max-width: 48ch; color: var(--chalk-dim); font-size: 14px; line-height: 1.45; }
+.v-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; }
+.v-row .v-btn { flex: none; }
+.v-price { font: 800 30px/1 var(--f-display); color: var(--ember); font-variant-numeric: tabular-nums; padding: 0 6px; }
+.v-price small { display: block; font: 600 10px/1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; color: var(--chalk-dim); margin-bottom: 4px; }
+.v-row .add { margin-left: 0; height: 44px; padding: 0 18px 0 14px; background: var(--ember); color: var(--ink-on-ember); border-color: var(--ember); font-size: 14px; }
+.v-hint { margin-top: 12px; font-size: 12px; color: var(--chalk-dim); display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.v-hint button { border: 1px solid rgba(247,197,34,.45); background: transparent; color: var(--yolk); border-radius: 999px; padding: 5px 11px; font-size: 12px; font-weight: 600; }
+@media (max-height: 700px) { .v-info p { display: none; } .v-stage { width: min(100%, 54vh); } }
+.empty { padding: 48px 0; text-align: center; color: var(--chalk-dim); }
+.empty b { display: block; font: italic 800 30px/1 var(--f-display); color: var(--chalk); text-transform: uppercase; margin-bottom: 8px; }
+
+/* ---------- Footer ---------- */
+footer { padding-block: 56px 140px; text-align: center; }
+footer .bye { font: italic 500 34px/1.1 var(--f-serif); color: var(--chalk); }
+footer p { color: var(--chalk-dim); font-size: 13px; margin: 10px auto 0; max-width: 46ch; }
+footer .logo { margin-top: 22px; font: italic 900 22px/1 var(--f-display); color: var(--yolk); letter-spacing: .02em; }
+
+/* ---------- Order tray ---------- */
+.tray-btn {
+  position: fixed; z-index: 40; left: 50%; transform: translateX(-50%) translateY(0);
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  display: flex; align-items: center; gap: 12px; width: min(440px, calc(100% - 32px));
+  padding: 10px 10px 10px 18px; border-radius: 999px; border: 0;
+  background: var(--yolk); color: #1b1503; box-shadow: 0 14px 40px rgba(0,0,0,.5);
+  transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .3s;
+}
+.tray-btn[hidden] { display: none !important; }
+.tray-btn .lbl { font: 700 15px/1 var(--f-body); margin-right: auto; text-align: left; }
+.tray-btn .lbl small { display: block; font-weight: 500; font-size: 12px; opacity: .75; margin-top: 3px; }
+.tray-btn .tot { background: #1b1503; color: var(--yolk); border-radius: 999px; padding: 10px 16px; font: 800 20px/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.tray-btn.bump { animation: bump .35s; }
+@keyframes bump { 50% { transform: translateX(-50%) scale(1.04); } }
+
+.sheet-bg { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.55); opacity: 0; transition: opacity .25s; }
+.sheet {
+  position: fixed; z-index: 51; left: 0; right: 0; bottom: 0; margin: 0 auto; max-width: 560px; max-height: 86vh;
+  display: flex; flex-direction: column;
+  background: #1f1d1a; border: 1px solid var(--line); border-bottom: 0; border-radius: 22px 22px 0 0;
+  padding: 10px 18px calc(18px + env(safe-area-inset-bottom, 0px));
+  transform: translateY(100%); transition: transform .3s cubic-bezier(.2,.8,.2,1);
+}
+.sheet.open { transform: translateY(0); }
+.sheet-bg.open { opacity: 1; }
+.grab { width: 40px; height: 4px; border-radius: 4px; background: rgba(239,233,223,.25); margin: 0 auto 12px; }
+.sheet h2 { margin: 0; font: italic 900 32px/1 var(--f-display); text-transform: uppercase; }
+.sheet .sub { color: var(--chalk-dim); font-size: 13px; margin: 6px 0 12px; }
+.lines { overflow-y: auto; margin: 0 -4px; padding: 0 4px; }
+.line { display: grid; grid-template-columns: minmax(0,1fr) auto auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px dashed rgba(239,233,223,.12); }
+.line .n { font: 700 18px/1.1 var(--f-display); text-transform: uppercase; }
+.line .n small { display: block; font: 500 12px/1.3 var(--f-body); text-transform: none; color: var(--chalk-dim); margin-top: 2px; }
+.qty { display: flex; align-items: center; gap: 2px; background: var(--slate-3); border-radius: 999px; padding: 3px; }
+.qty button { width: 28px; height: 28px; border-radius: 50%; border: 0; background: transparent; font-size: 18px; line-height: 1; }
+.qty button:hover { background: rgba(239,233,223,.08); }
+.qty span { min-width: 18px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.line .p { font: 800 19px/1 var(--f-display); color: var(--ember); font-variant-numeric: tabular-nums; min-width: 56px; text-align: right; }
+.sum { display: flex; align-items: baseline; justify-content: space-between; padding-top: 14px; }
+.sum span { color: var(--chalk-dim); font-size: 14px; }
+.sum b { font: 800 34px/1 var(--f-display); color: var(--yolk); font-variant-numeric: tabular-nums; }
+.sheet-actions { display: flex; gap: 10px; margin-top: 14px; }
+.sheet-actions button { flex: 1; height: 46px; border-radius: 999px; font-weight: 600; font-size: 14px; }
+.btn-ghost { background: transparent; border: 1px solid var(--line); }
+.btn-solid { background: var(--ember); border: 0; color: var(--ink-on-ember); }
+.confirm-clear { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 10px; font-size: 13px; color: var(--chalk-dim); }
+.confirm-clear button { border: 0; background: transparent; color: var(--ember); font-weight: 600; padding: 6px 8px; }
+</style>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="bar-row">
+      <a class="brand" href="#inicio" aria-label="P&amp;R Flaco's, ir al inicio"><b>P&amp;R FLACO'S</b><span>Pizzería</span></a>
+      <label class="search" for="q">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Buscar" autocomplete="off" aria-label="Buscar plato o ingrediente">
+        <button class="clear" type="button" id="qclear" aria-label="Borrar búsqueda" hidden>×</button>
+      </label>
+    </div>
+    <nav class="rail" id="rail" aria-label="Categorías"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="inicio">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Carta digital</div>
+      <h1>Menú</h1>
+      <p>Pizzas al horno, pastas, carnes a la parrilla y algo para picar. Elige con calma.</p>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 200 200" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="100" cy="100" r="92" stroke="#f7c522" stroke-width="3" stroke-dasharray="2 7" opacity=".7"/>
+        <circle cx="100" cy="100" r="80" stroke="#f2873a" stroke-width="10" opacity=".9"/>
+        <circle cx="100" cy="100" r="70" fill="#f2873a" fill-opacity=".1" stroke="#efe9df" stroke-width="2" opacity=".85"/>
+        <g stroke="#efe9df" stroke-width="2" opacity=".55"><path d="M100 30v140M30 100h140M50.5 50.5l99 99M149.5 50.5l-99 99"/></g>
+        <g fill="#f2873a"><circle cx="78" cy="62" r="9"/><circle cx="128" cy="74" r="9"/><circle cx="66" cy="112" r="9"/><circle cx="112" cy="122" r="9"/><circle cx="138" cy="118" r="7"/><circle cx="92" cy="146" r="8"/><circle cx="100" cy="90" r="6"/></g>
+        <g fill="#f7c522"><circle cx="86" cy="84" r="3"/><circle cx="120" cy="98" r="3"/><circle cx="82" cy="128" r="3"/><circle cx="134" cy="140" r="3"/><circle cx="108" cy="58" r="3"/><circle cx="58" cy="90" r="3"/></g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="facts">
+    <span class="fact"><i></i>Precios en <strong>dólares (USD)</strong></span>
+    <span class="fact"><i></i>Pizzas en <strong>4 tamaños</strong></span>
+    <span class="fact"><i></i>Arma tu pedido y <strong>muéstralo al mesonero</strong></span>
+  </div>
+
+  <div class="feature has3d">
+    <div class="f3d" id="f3d" role="button" tabindex="0" aria-label="Ver Pizza El Flaco en 3D"><span class="b3d" aria-hidden="true"></span><img src="fotos/pz16-m.webp" alt="Pizza El Flaco" id="f3dImg"></div>
+    <div class="f-body">
+      <div>
+        <div class="tag">La de la casa</div>
+        <h2>Pizza El Flaco</h2>
+        <p>Jamón, salchichón, pimentón, tocineta, pepperoni, chorizo, champiñones, anchoas, maíz y queso amarillo. Todo lo bueno en una sola.</p>
+      </div>
+      <div class="from"><small>Desde</small><b>$16,50</b></div>
+      <a href="#item-pz16">Ver tamaños <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+
+  <div id="menu"></div>
+  <div class="empty" id="empty" hidden><b>Sin resultados</b>No encontramos nada con esa búsqueda. Prueba con otro plato o ingrediente.</div>
+
+  <footer>
+    <div class="bye">Buen provecho</div>
+    <p>Precios en dólares estadounidenses. Consulta con tu mesonero disponibilidad del día y métodos de pago.</p>
+    <div class="logo">P&amp;R FLACO'S</div>
+  </footer>
+</main>
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="vTitle" hidden>
+  <div class="v-top">
+    <button class="v-btn" type="button" id="vClose" aria-label="Cerrar">×</button>
+    <span class="count" id="vCount"></span>
+    <span style="width:44px"></span>
+  </div>
+  <div class="v-stage" id="vStage">
+    <canvas id="vCanvas" aria-hidden="true"></canvas>
+    <img id="vImg" alt="" hidden>
+    <div class="v-load" id="vLoad"><i></i></div>
+  </div>
+  <div class="v-info" id="vInfo">
+    <div class="v-cat" id="vCat"></div>
+    <h2 id="vTitle"></h2>
+    <p id="vDesc"></p>
+    <div class="v-row">
+      <button class="v-btn" type="button" id="vPrev" aria-label="Plato anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg></button>
+      <div class="v-price" id="vPrice"></div>
+      <span id="vAddWrap"></span>
+      <button class="v-btn" type="button" id="vNext" aria-label="Plato siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></button>
+    </div>
+    <div class="v-hint"><span id="vHintTxt">Arrastra el plato para girarlo</span><button type="button" id="gyroBtn" hidden>Mover con el teléfono</button></div>
+  </div>
+</div>
+
+<button class="tray-btn" id="trayBtn" type="button" hidden>
+  <span class="lbl" id="trayLbl">Mi pedido<small>0 artículos</small></span>
+  <span class="tot" id="trayTot">$0</span>
+</button>
+<div class="sheet-bg" id="sheetBg" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <div class="grab"></div>
+  <h2 id="sheetTitle">Mi pedido</h2>
+  <div class="sub">Muéstrale esta lista a tu mesonero. El total es referencial.</div>
+  <div class="lines" id="lines"></div>
+  <div class="sum"><span>Total estimado</span><b id="sumTot">$0</b></div>
+  <div class="sheet-actions">
+    <button class="btn-ghost" type="button" id="clearBtn">Vaciar</button>
+    <button class="btn-solid" type="button" id="closeBtn">Seguir viendo</button>
+  </div>
+  <div class="confirm-clear" id="confirmClear" hidden>¿Vaciar el pedido? <button type="button" id="yesClear">Sí, vaciar</button><button type="button" id="noClear">No</button></div>
+</div>
+
+<script>
+/* ===== Menú P&R Flaco's: transcrito de la carta impresa. Editar aquí para cambiar precios. ===== */
+const ICONS = {
+  pizzas: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9c7-5 17-5 24 0L16 29z"/><path d="M6.5 12.5c6-3.5 13-3.5 19 0"/><circle cx="13" cy="16" r="1.6" fill="currentColor"/><circle cx="19" cy="18" r="1.6" fill="currentColor"/><circle cx="16" cy="23" r="1.4" fill="currentColor"/></svg>',
+  pastas: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16h24a12 12 0 0 1-24 0z"/><path d="M9 16c0-4 3-4 3-8M15 16c0-4 3-4 3-8M21 16c0-3 2-4 2-7"/><path d="M12 28h8"/></svg>',
+  entradas: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20c0-6 5-9 11-9s11 3 11 9z"/><path d="M3 20h26M8 24h16"/><path d="M12 15l1 2M17 14v2M21 15l-1 2"/></svg>',
+  carnes: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8c6-4 17-2 19 6s-5 13-12 12S2 12 7 8z"/><circle cx="18" cy="15" r="3.2"/><path d="M4 28l5-5"/></svg>',
+  nuevos: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 14c0-5 5-8 11-8s11 3 11 8z"/><path d="M4 18h24M6 22h20a3 3 0 0 1-3 4H9a3 3 0 0 1-3-4z"/><path d="M12 10h.01M17 9h.01M21 11h.01"/></svg>',
+  bebidas: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h16l-2 19H10z"/><path d="M8.6 15h14.8"/><path d="M18 9l3-6h4"/></svg>',
+};
+const PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+const SIZES = [['mini','Mini'],['peq','Pequeña'],['med','Mediana'],['fam','Familiar']];
+const SIZE_SHORT = { mini:'Mini', peq:'Peq.', med:'Med.', fam:'Fam.' };
+
+const MENU = [
+  { id:'entradas', name:'Entradas', items:[
+    { id:'en1', n:'Bruschetas', d:'Tostadas de pan con pico e gallo, pesto, anchoas, aceitunas negras y mozzarella gratinada.', p:6 },
+    { id:'en2', n:'Tequeños', d:'8 unidades acompañados con salsa napole.', p:7 },
+    { id:'en3', n:'Ensalada César', d:'Lechuga, anchoas, tocineta y crotones de pan.', p:10 },
+    { id:'en4', n:'Ensalada Agridulce', d:'Lechuga, tomate en cuadros, cebolla, piña, maíz, aceitunas negras, jamón, champiñones, perejil y queso mozzarella, con aderezo mostaza miel o italiano.', p:12 },
+    { id:'en5', n:'Focaccia', d:'', p:6 },
+  ]},
+  { id:'pizzas', name:'Pizzas', note:'Elige el tamaño', items:[
+    { id:'pz1', no:1, n:'Margarita', d:'Salsa y queso mozzarella.', s:[8,10.5,14,20] },
+    { id:'pz2', no:2, n:'Sencilla', d:'Salsa, queso mozzarella y jamón.', s:[9,11.5,15.5,23] },
+    { id:'pz3', no:3, n:'Champiñones', d:'Salsa, mozzarella y champiñones.', s:[9.5,12.5,19,26.5] },
+    { id:'pz4', no:4, n:'Napole', d:'Salsa, mozzarella y anchoas.', s:[8.5,11.5,15.5,23] },
+    { id:'pz5', no:5, n:'Supermezcla', d:'Salsa, queso mozzarella, jamón, anchoas y champiñones.', s:[12.5,16.5,21.5,31] },
+    { id:'pz6', no:6, n:'Primavera', d:'Salsa, mozzarella, jamón, tocinetas y maíz.', s:[12.5,16.5,23,33] },
+    { id:'pz7', no:7, n:'Alexia', d:'Salsa, mozzarella, jamón, champiñón y pimentón.', s:[12,15.5,20.5,30] },
+    { id:'pz8', no:8, n:'Bari', d:'Salsa, mozzarella, jamón, salchichón y cebolla.', s:[9.5,12.5,17.5,26.5] },
+    { id:'pz9', no:9, n:'Granjera', d:'Salsa, mozzarella, jamón, pollo y maíz.', s:[10,14.5,21.5,31] },
+    { id:'pz10', no:10, n:'Hawaiana', d:'Salsa, mozzarella, jamón y piña.', s:[9,12.5,16.5,23.5] },
+    { id:'pz11', no:11, n:'Gorbacho o Picante', d:'Salsa, queso mozzarella, jamón, salchichón y picante.', s:[9.5,12.5,18,26] },
+    { id:'pz12', no:12, n:'Alemana', d:'Salsa, mozzarella, jamón, salchichón, tocinetas, salchicha alemana y queso amarillo.', s:[14,17.5,25.5,37] },
+    { id:'pz13', no:13, n:'Vegetariana', d:'Salsa, mozzarella, champiñón, cebolla, pimentón, tomate en rodajas, aceitunas negras, maíz y perejil con ajo.', s:[13.5,18.5,24,35] },
+    { id:'pz14', no:14, n:'Hilari', d:'Salsa, mozzarella, jamón, tocinetas, cebolla, pimentón, maíz y salchicha alemana.', s:[12.5,17.5,26.5,38] },
+    { id:'pz15', no:15, n:'Calzón', d:'Salsa, mozzarella, jamón, tocinetas, salchicha alemana, pimentón, aceitunas negras y maíz.', v:[['cerrado','Cerrado',24.5],['abierto','Abierto',31]] },
+    { id:'pz16', no:16, n:'El Flaco', d:'Salsa, queso mozzarella, jamón, salchichón, pimentón, tocineta, pepperoni, chorizo, champiñones, anchoas, maíz y queso amarillo.', s:[16.5,25,38,54], badge:'De la casa' },
+    { id:'pz17', no:17, n:'Pepperoni', d:'Salsa, queso mozzarella, jamón, pepperoni y anchoas.', s:[10,15.5,20.5,27] },
+    { id:'pz18', no:18, n:'4 Quesos', d:'Salsa, queso mozzarella, pecorino, provolone y queso azul o roquefort.', s:[16.5,20.5,25,37] },
+    { id:'pz19', no:19, n:'Blanca', d:'Queso mozzarella, jamón, champiñones, chorizo, tomate en rodajas y perejil con ajo.', s:[11,15.5,21,29] },
+  ]},
+  { id:'pastas', name:'Pastas', items:[
+    { id:'pa1', no:1, n:'Pasticho tradicional', d:'Acompañado de su focaccia.', p:10 },
+    { id:'pa2', no:2, n:'Carbonara', d:'Salsa blanca, cebolla, pimentón, tocineta y pecorino.', p:10 },
+    { id:'pa3', no:3, n:'Napole', d:'Salsa roja y pecorino.', p:7.5 },
+    { id:'pa4', no:4, n:'Bologna', d:'Salsa napoli, carne molida y pecorino.', p:9 },
+    { id:'pa5', no:5, n:'Putanesca', d:'Salsa roja, anchoas, ajo, pimentón, cebollas, aceitunas negras, alcaparras y pecorino.', p:8.5 },
+    { id:'pa6', no:6, n:'Amatriciana', d:'Salsa roja, cebolla, pimentón, tocineta, aceitunas negras, peperoni chino y pecorino.', p:10.5 },
+    { id:'pa7', no:7, n:'Alfredo', d:'Salsa blanca, cebolla, pimentón, jamón, mozzarella y pecorino.', p:9 },
+    { id:'pa8', no:8, n:'Arrabiata', d:'Salsa roja, trozos de tomate, ajo, cebolla, pimentón, albahaca, peperoni chino, orégano, tomillo, perejil y pecorino.', p:8.5 },
+    { id:'pa9', no:9, n:'Andresito', d:'Salsa blanca, cebolla, pimentón, ajoporro, champiñón, tocineta y pecorino.', p:10 },
+    { id:'pa10', no:10, n:'Pesto', d:'Ajo, aceite de oliva, albahaca, perejil, maní o almendras y pecorino.', p:10.5 },
+    { id:'pa11', no:11, n:'Trisalsa', d:'Salsa bologna, carbonara y pesto.', p:11.5 },
+    { id:'pa12', no:12, n:'Cuatro Quesos', d:'Salsa blanca, mozzarella, pecorino, manchego y queso azul o amarillo.', p:10.5 },
+    { id:'pa13', no:13, n:'Champiñones', d:'Salsa blanca, cebolla, pimentón, perejil con ajo, champiñones, especias y pecorino.', p:9 },
+    { id:'pa14', no:14, n:'El Flaco', d:'Salsa roja, cebolla, pimentón, lomito, boloña, tocineta, champiñones y pecorino.', p:12, badge:'De la casa' },
+  ]},
+  { id:'carnes', name:'Carnes', items:[
+    { id:'ca1', n:'Picada El Flaco', d:'Carne, pollo, cochino, chorizo, queso, papas al horno, yuca, ensalada mixta, pico e gallo y picante.', v:[['pq','Pequeña',28],['fm','Familiar',38]], badge:'Para compartir' },
+    { id:'ca2', n:'Churrasco de Pollo o Lomito', d:'350 g de pollo o lomito, papas al horno, yuca, ensalada mixta, pico e gallo y picante.', p:17 },
+    { id:'ca3', n:'Churrasco de Cochino', d:'350 g de cochino, papas al horno, yuca, ensalada mixta, pico e gallo y picante.', p:18 },
+    { id:'ca4', n:'Lomito al Vino', d:'Lomito en salsa de vino tinto, puré de papas y ensalada César o mixta.', p:18 },
+    { id:'ca5', n:'Pollo a la Parmesana', d:'Pollo a la plancha con salsa napole gratinado al horno, puré de papas y ensalada César o mixta.', p:18 },
+    { id:'ca6', n:'Fajitas', d:'Carne, pollo o mixta.', p:20 },
+  ]},
+  { id:'nuevos', name:'Platos nuevos', items:[
+    { id:'nu1', n:'Hamburguesa de Carne', d:'Lechuga, tomate, cebolla, maíz, jamón, queso amarillo o fundido, papas y salsas.', p:6.5, badge:'Nuevo' },
+    { id:'nu2', n:'Burrito Mixto', d:'Lomito, pollo, lechuga, pico e gallo, jamón, queso amarillo o fundido, maíz, papas fritas y salsas.', p:7.5, badge:'Nuevo' },
+    { id:'nu3', n:'Salchipapas', d:'200 g de papas fritas, salchicha, queso blanco y salsas.', p:6, badge:'Nuevo' },
+    { id:'nu4', n:'Minicalzón', d:'Salsa, queso mozzarella, jamón, tocineta y maíz.', p:10, badge:'Nuevo' },
+    { id:'nu5', n:'Pepito Larense', d:'Lomito, pollo o mixto, gratinado con quesos y bañado en fondue, con papas fritas.', p:12, badge:'Nuevo' },
+  ]},
+  { id:'bebidas', name:'Bebidas', drinks:true, items:[
+    { id:'be1', n:'Refresco botella', p:1.5 },
+    { id:'be2', n:'Refresco litro', p:2.5 },
+    { id:'be3', n:'Refresco 1,5 L', p:3 },
+    { id:'be4', n:'Refresco 2 L', p:4 },
+    { id:'be5', n:'Nestea', p:1.5 },
+    { id:'be6', n:'Limonada', p:3 },
+    { id:'be7', n:'Batidos', p:3 },
+    { id:'be8', n:'Sangría por copa', p:2 },
+    { id:'be9', n:'Sangría verano', p:2 },
+    { id:'be10', n:'Cerveza', p:1.2 },
+    { id:'be11', n:'Tobo de cerveza', p:9 },
+  ]},
+];
+
+/* ===== Fotos: agrega aquí el archivo de cada plato, ej. pz16:'fotos/pz16.jpg'. Los platos sin foto se muestran sin imagen. ===== */
+const FOTOS = {};
+MENU.forEach(c => c.items.forEach(it => { FOTOS[it.id] = 'fotos/' + it.id; })); // fotos/<id>.webp (1254 px), -m.webp (720 px), -d.webp (mapa de profundidad 3D)
+const CUBE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg>';
+const FOTO_NOTA = 'Imagen ilustrativa';
+
+/* ===== Helpers ===== */
+const $ = (s, el=document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const money = n => { const f = Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ','); return '$' + f; };
+const priceHTML = n => { const f = Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ','); return '<sup>$</sup>' + f; };
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
+const BY_ID = {};
+MENU.forEach(c => c.items.forEach(it => { it.cat = c.id; BY_ID[it.id] = it; }));
+
+let size = store.get('flacos.size', 'med');
+if (!SIZES.some(s => s[0] === size)) size = 'med';
+let order = store.get('flacos.order', []); // [{key,id,opt,label,price,q}]
+order = Array.isArray(order) ? order.filter(l => BY_ID[l.id]) : [];
+
+/* ===== Render ===== */
+function itemHTML(it) {
+  const num = it.no ? `<span class="num">${String(it.no).padStart(2,'0')}</span>` : '';
+  const badge = it.badge ? ` <span class="badge">${esc(it.badge)}</span>` : '';
+  const desc = it.d ? `<p>${esc(it.d)}</p>` : '';
+  const flag = it.flag ? `<div class="flag">⚠ ${esc(it.flag)}</div>` : '';
+  let price = '', foot = '';
+  if (it.s) {
+    const chips = SIZES.map(([k,l],i) => `<button type="button" class="chip" data-size="${k}" aria-pressed="${k===size}"><small>${SIZE_SHORT[k]}</small><b>${money(it.s[i]).slice(1)}</b></button>`).join('');
+    foot = `<div class="foot"><div class="chips" role="group" aria-label="Tamaños de ${esc(it.n)}">${chips}</div><button type="button" class="add" data-add="${it.id}" aria-label="Agregar ${esc(it.n)}">${PLUS}<span>Agregar</span></button></div>`;
+  } else if (it.v) {
+    const chips = it.v.map(([k,l,p],i) => `<button type="button" class="chip" data-opt="${k}" aria-pressed="${i===0}"><small>${esc(l)}</small><b>${money(p).slice(1)}</b></button>`).join('');
+    foot = `<div class="foot"><div class="chips two" role="group" aria-label="Opciones de ${esc(it.n)}">${chips}</div><button type="button" class="add" data-add="${it.id}" aria-label="Agregar ${esc(it.n)}">${PLUS}<span>Agregar</span></button></div>`;
+  } else {
+    price = `<div class="price">${priceHTML(it.p)}</div>`;
+    foot = `<div class="foot"><button type="button" class="add" data-add="${it.id}" aria-label="Agregar ${esc(it.n)}">${PLUS}<span>Agregar</span></button></div>`;
+  }
+  const ph = photoHTML(it);
+  return `<article class="item" id="item-${it.id}" data-id="${it.id}" data-q="${esc(norm(it.n+' '+(it.d||'')))}">${ph}
+    <div class="title">${num}<h3>${esc(it.n)}${badge}</h3></div>${price}${desc}${flag}${foot}</article>`;
+}
+function photoHTML(it) {
+  if (!FOTOS[it.id]) return '';
+  return `<button type="button" class="ph" data-view="${it.id}" aria-label="Ver ${esc(it.n)} en 3D"><img src="${esc(FOTOS[it.id])}-m.webp" alt="${esc(it.n)}" loading="lazy" decoding="async" width="720" height="720" onload="this.classList.add('ok')" onerror="this.classList.add('ok')"><span class="b3d" aria-hidden="true">${CUBE}3D</span><span class="cap">${FOTO_NOTA}</span></button>`;
+}
+function drinkHTML(it) {
+  return `<div class="dtile" data-id="${it.id}" data-q="${esc(norm(it.n))}">${photoHTML(it)}<div class="row"><div><span>${esc(it.n)}</span><b>${money(it.p)}</b></div><button type="button" class="mini-add" data-add="${it.id}" aria-label="Agregar ${esc(it.n)}">${PLUS}</button></div></div>`;
+}
+function render() {
+  $('#rail').innerHTML = MENU.map(c => `<a href="#${c.id}" data-cat="${c.id}">${ICONS[c.id]}${esc(c.name)}</a>`).join('');
+  $('#menu').innerHTML = MENU.map(c => {
+    let side = c.note ? `<span class="note">${esc(c.note)}</span>` : '';
+    if (c.id === 'pizzas') side = `<div class="size-wrap"><div class="sizes" role="group" aria-label="Tamaño de pizza">${SIZES.map(([k,l]) => `<button type="button" data-size="${k}" aria-pressed="${k===size}">${l}</button>`).join('')}</div></div>`;
+    if (c.drinks) side = `<span class="note">Bien frías · imágenes ilustrativas</span>`;
+    const body = c.drinks ? `<div class="dgrid">${c.items.map(drinkHTML).join('')}</div>` : `<div class="grid">${c.items.map(itemHTML).join('')}</div>`;
+    return `<section class="cat" id="${c.id}" data-cat="${c.id}"><div class="cat-head"><h2>${ICONS[c.id]}${esc(c.name)}</h2>${side}</div>${body}</section>`;
+  }).join('');
+}
+render();
+
+/* ===== Pizza size ===== */
+function setSize(k) {
+  size = k; store.set('flacos.size', k);
+  document.querySelectorAll('#pizzas [data-size]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.size === k)));
+}
+document.addEventListener('click', e => {
+  const sz = e.target.closest('[data-size]');
+  if (sz) { setSize(sz.dataset.size); return; }
+  const op = e.target.closest('[data-opt]');
+  if (op) { op.parentElement.querySelectorAll('[data-opt]').forEach(b => b.setAttribute('aria-pressed', String(b === op))); return; }
+  const add = e.target.closest('[data-add]');
+  if (add) { addItem(add.dataset.add, add); }
+});
+
+/* ===== Search ===== */
+const q = $('#q'), qclear = $('#qclear');
+function applySearch() {
+  const terms = norm(q.value.trim()).split(/\s+/).filter(Boolean);
+  qclear.hidden = !terms.length;
+  let any = false;
+  document.querySelectorAll('section.cat').forEach(sec => {
+    let shown = 0;
+    sec.querySelectorAll('[data-q]').forEach(el => {
+      const ok = terms.every(t => el.dataset.q.includes(t) || norm(sec.dataset.cat).includes(t));
+      el.hidden = !ok; if (ok) shown++;
+    });
+    sec.hidden = !shown; if (shown) any = true;
+  });
+  $('.feature').hidden = terms.length > 0;
+  $('#empty').hidden = any;
+}
+q.addEventListener('input', applySearch);
+qclear.addEventListener('click', () => { q.value = ''; applySearch(); q.focus(); });
+
+/* ===== Scrollspy ===== */
+const railLinks = () => document.querySelectorAll('#rail a');
+function markActive(id) {
+  railLinks().forEach(a => {
+    const on = a.dataset.cat === id;
+    a.setAttribute('aria-current', String(on));
+    if (on) { const r = $('#rail'); const x = a.offsetLeft - r.clientWidth / 2 + a.clientWidth / 2; r.scrollTo({ left: x, behavior: 'smooth' }); }
+  });
+}
+let current = '';
+function spy() {
+  const line = 140; let id = MENU[0].id;
+  document.querySelectorAll('section.cat:not([hidden])').forEach(s => { if (s.getBoundingClientRect().top - line <= 0) id = s.id; });
+  if (id !== current) { current = id; markActive(id); }
+}
+addEventListener('scroll', spy, { passive: true });
+spy();
+
+/* ===== Order tray ===== */
+function addItem(id, btn) {
+  const it = BY_ID[id]; if (!it) return;
+  let opt = '', label = '', price = it.p;
+  if (it.s) { const i = SIZES.findIndex(s => s[0] === size); opt = size; label = SIZES[i][1]; price = it.s[i]; }
+  if (it.v) {
+    const card = btn.closest('.item'); const sel = card && card.querySelector('[data-opt][aria-pressed="true"]');
+    const v = it.v.find(x => x[0] === (sel ? sel.dataset.opt : it.v[0][0])) || it.v[0];
+    opt = v[0]; label = v[1]; price = v[2];
+  }
+  const key = id + ':' + opt;
+  const line = order.find(l => l.key === key);
+  if (line) line.q++; else order.push({ key, id, opt, label, price, q: 1 });
+  saveOrder();
+  btn.classList.add('done');
+  if (btn.classList.contains('add')) { const html = btn.innerHTML; btn.innerHTML = btn.previousElementSibling ? '✓' : '✓ Agregado'; setTimeout(() => { btn.innerHTML = html; btn.classList.remove('done'); }, 1100); }
+  else setTimeout(() => btn.classList.remove('done'), 900);
+  const tb = $('#trayBtn'); tb.classList.remove('bump'); void tb.offsetWidth; tb.classList.add('bump');
+}
+function saveOrder() { store.set('flacos.order', order); paintTray(); }
+function paintTray() {
+  const count = order.reduce((a, l) => a + l.q, 0);
+  const total = order.reduce((a, l) => a + l.q * l.price, 0);
+  $('#trayBtn').hidden = count === 0;
+  $('#trayLbl').innerHTML = `Ver mi pedido<small>${count} ${count === 1 ? 'artículo' : 'artículos'}</small>`;
+  $('#trayTot').textContent = money(Math.round(total * 100) / 100);
+  $('#sumTot').textContent = money(Math.round(total * 100) / 100);
+  $('#lines').innerHTML = order.map((l, i) => {
+    const it = BY_ID[l.id];
+    const sub = [it.cat === 'pizzas' ? 'Pizza' : it.cat === 'pastas' ? 'Pasta' : '', l.label].filter(Boolean).join(' · ');
+    return `<div class="line"><div class="n">${esc(it.n)}${sub ? `<small>${esc(sub)}</small>` : ''}</div>
+      <div class="qty"><button type="button" data-dec="${i}" aria-label="Quitar uno">−</button><span>${l.q}</span><button type="button" data-inc="${i}" aria-label="Agregar uno">+</button></div>
+      <div class="p">${money(Math.round(l.q * l.price * 100) / 100)}</div></div>`;
+  }).join('');
+  if (count === 0) closeSheet();
+}
+$('#lines').addEventListener('click', e => {
+  const inc = e.target.closest('[data-inc]'), dec = e.target.closest('[data-dec]');
+  if (inc) order[+inc.dataset.inc].q++;
+  if (dec) { const i = +dec.dataset.dec; order[i].q--; if (order[i].q <= 0) order.splice(i, 1); }
+  if (inc || dec) saveOrder();
+});
+const sheet = $('#sheet'), bg = $('#sheetBg');
+function openSheet() { bg.hidden = false; sheet.hidden = false; requestAnimationFrame(() => { bg.classList.add('open'); sheet.classList.add('open'); }); $('#closeBtn').focus(); }
+function closeSheet() {
+  if (sheet.hidden) return;
+  bg.classList.remove('open'); sheet.classList.remove('open'); $('#confirmClear').hidden = true;
+  setTimeout(() => { bg.hidden = true; sheet.hidden = true; }, 300);
+}
+$('#trayBtn').addEventListener('click', openSheet);
+$('#closeBtn').addEventListener('click', closeSheet);
+bg.addEventListener('click', closeSheet);
+addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+$('#clearBtn').addEventListener('click', () => { $('#confirmClear').hidden = false; });
+$('#noClear').addEventListener('click', () => { $('#confirmClear').hidden = true; });
+$('#yesClear').addEventListener('click', () => { order = []; saveOrder(); });
+paintTray();
+
+/* ===== 3D: cada foto + su mapa de profundidad se renderizan en WebGL con paralaje real (oclusión), luz especular y cámara suave ===== */
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const VS = 'attribute vec2 a;varying vec2 v;void main(){v=a*.5+.5;gl_Position=vec4(a,0.,1.);}';
+const FS = `precision highp float;
+varying vec2 v;
+uniform sampler2D uImg,uDep;
+uniform vec2 uOff,uScale;
+uniform float uZoom,uFocus,uShine;
+float D(vec2 p){return texture2D(uDep,p).r;}
+void main(){
+  vec2 uv=(v-.5)*uScale/uZoom+.5;
+  const int N=26; float st=1./float(N);
+  float pt=1.; float pd=D(uv-uOff*(1.-uFocus))-1.; vec2 s=uv; float t=1.;
+  for(int i=1;i<=N;i++){
+    t=1.-float(i)*st; s=uv-uOff*(t-uFocus);
+    float d=D(s)-t;
+    if(d>=0.){ float a=pd/(pd-d); t=mix(pt,t,a); s=uv-uOff*(t-uFocus); break; }
+    pt=t; pd=d;
+  }
+  s=clamp(s,.001,.999);
+  vec3 c=texture2D(uImg,s).rgb;
+  float e=1./512.;
+  float dx=D(s+vec2(e,0.))-D(s-vec2(e,0.)); float dy=D(s+vec2(0.,e))-D(s-vec2(0.,e));
+  vec3 n=normalize(vec3(-dx*28.,-dy*28.,1.));
+  vec3 L=normalize(vec3(-.55+uOff.x*9.,.65+uOff.y*9.,.85));
+  float spec=pow(max(dot(reflect(-L,n),vec3(0.,0.,1.)),0.),26.);
+  float lum=dot(c,vec3(.299,.587,.114));
+  float dep=D(s);
+  c+=vec3(1.,.86,.68)*spec*uShine*smoothstep(.25,.9,lum)*dep;
+  c*=1.+.06*(dot(n,L)-.5)*dep;
+  gl_FragColor=vec4(c,1.);
+}`;
+class Dish3D {
+  constructor(canvas, opt = {}) {
+    this.cv = canvas; this.o = Object.assign({ amp: .06, focus: .42, zoom: 1.07, dpr: 1.75, shine: .55, sway: 1 }, opt);
+    const gl = this.gl = canvas.getContext('webgl', { antialias: false, alpha: false, premultipliedAlpha: false, powerPreference: 'high-performance' });
+    if (!gl) return;
+    const sh = (t, s) => { const x = gl.createShader(t); gl.shaderSource(x, s); gl.compileShader(x); return x; };
+    const p = this.p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) { this.gl = null; return; }
+    gl.useProgram(p);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+    const a = gl.getAttribLocation(p, 'a'); gl.enableVertexAttribArray(a); gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0);
+    this.u = {}; ['uImg','uDep','uOff','uScale','uZoom','uFocus','uShine'].forEach(k => this.u[k] = gl.getUniformLocation(p, k));
+    gl.uniform1i(this.u.uImg, 0); gl.uniform1i(this.u.uDep, 1);
+    this.tex = [gl.createTexture(), gl.createTexture()];
+    this.cur = { x: 0, y: 0 }; this.tgt = { x: 0, y: 0 }; this.user = null; this.t0 = performance.now(); this.intro = 0; this.ready = false; this.running = false;
+    this.loop = this.loop.bind(this);
+    canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); this.ready = false; });
+  }
+  get ok() { return !!this.gl; }
+  img(src) { return new Promise((res, rej) => { const i = new Image(); i.decoding = 'async'; i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
+  async load(base, full) {
+    const token = this.token = {};
+    const [im, dp] = await Promise.all([this.img(base + (full ? '.webp' : '-m.webp')), this.img(base + '-d.webp')]);
+    if (token !== this.token || !this.gl) return false;
+    const gl = this.gl;
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    [[0, im], [1, dp]].forEach(([k, src]) => {
+      gl.activeTexture(gl.TEXTURE0 + k); gl.bindTexture(gl.TEXTURE_2D, this.tex[k]);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, src);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    });
+    this.ready = true; this.intro = performance.now(); this.cur = { x: -1.1, y: .9 };
+    return true;
+  }
+  resize() {
+    const r = this.cv.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, this.o.dpr);
+    const w = Math.max(1, Math.round(r.width * d)), h = Math.max(1, Math.round(r.height * d));
+    if (this.cv.width !== w || this.cv.height !== h) { this.cv.width = w; this.cv.height = h; }
+    const A = w / h; this.scale = A >= 1 ? [1, 1 / A] : [A, 1];
+  }
+  start() { if (!this.ok || this.running) return; this.running = true; this.last = performance.now(); requestAnimationFrame(this.loop); }
+  stop() { this.running = false; }
+  loop(now) {
+    if (!this.running) return;
+    const dt = Math.min(.05, (now - this.last) / 1000); this.last = now;
+    const t = (now - this.t0) / 1000, sw = REDUCED ? 0 : this.o.sway;
+    let tx = Math.sin(t * .62) * .8 * sw, ty = Math.sin(t * .47 + 1.3) * .5 * sw;
+    if (this.user) { tx = this.user.x; ty = this.user.y; }
+    this.tgt.x = tx; this.tgt.y = ty;
+    const k = 1 - Math.exp(-dt * (this.user ? 9 : 2.6));
+    this.cur.x += (this.tgt.x - this.cur.x) * k; this.cur.y += (this.tgt.y - this.cur.y) * k;
+    if (this.ready) this.draw(t);
+    requestAnimationFrame(this.loop);
+  }
+  draw(t) {
+    const gl = this.gl; this.resize();
+    gl.viewport(0, 0, this.cv.width, this.cv.height);
+    const amp = this.o.amp, ie = Math.min(1, (performance.now() - this.intro) / 1400), zin = 1 - Math.pow(1 - ie, 3);
+    gl.uniform2f(this.u.uOff, this.cur.x * amp, this.cur.y * amp);
+    gl.uniform2f(this.u.uScale, this.scale[0], this.scale[1]);
+    gl.uniform1f(this.u.uZoom, this.o.zoom * (.94 + .06 * zin) + (REDUCED ? 0 : Math.sin(t * .35) * .008));
+    gl.uniform1f(this.u.uFocus, this.o.focus); gl.uniform1f(this.u.uShine, this.o.shine);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+  /* pointer drag → orbit; release → vuelve al vaivén suave */
+  bindDrag(el, strength = 1) {
+    let sx = 0, sy = 0, id = null, moved = false;
+    el.addEventListener('pointerdown', e => { id = e.pointerId; sx = e.clientX; sy = e.clientY; moved = false; this.user = { x: this.cur.x, y: this.cur.y }; this.ux = this.cur.x; this.uy = this.cur.y; el.setPointerCapture && el.setPointerCapture(id); });
+    el.addEventListener('pointermove', e => {
+      if (e.pointerId !== id) { if (e.pointerType === 'mouse' && id === null && strength < 1) { const r = el.getBoundingClientRect(); this.user = { x: ((e.clientX - r.left) / r.width - .5) * 2.2, y: -((e.clientY - r.top) / r.height - .5) * 1.6 }; } return; }
+      const r = el.getBoundingClientRect(), dx = (e.clientX - sx) / r.width, dy = (e.clientY - sy) / r.height;
+      if (Math.abs(dx) + Math.abs(dy) > .02) moved = true;
+      this.user = { x: Math.max(-1.6, Math.min(1.6, this.ux + dx * 3.2)), y: Math.max(-1.2, Math.min(1.2, this.uy - dy * 2.6)) };
+    });
+    const up = e => { if (e.pointerId !== id) return; id = null; this.user = this.gyro || null; this.lastMoved = moved; };
+    el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+    el.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse' && id === null) this.user = this.gyro || null; });
+  }
+}
+
+/* Giroscopio: inclina el teléfono para mirar el plato */
+const Gyro = {
+  on: false, base: null, subs: new Set(),
+  handle(e) {
+    if (e.gamma == null) return;
+    if (!Gyro.base) Gyro.base = { b: e.beta, g: e.gamma };
+    const x = Math.max(-1.4, Math.min(1.4, (e.gamma - Gyro.base.g) / 18)), y = Math.max(-1.1, Math.min(1.1, -(e.beta - Gyro.base.b) / 22));
+    Gyro.subs.forEach(d => { d.gyro = { x, y }; if (!d.dragging) d.user = d.gyro; });
+  },
+  async enable() {
+    try {
+      if (typeof DeviceOrientationEvent !== 'undefined' && DeviceOrientationEvent.requestPermission) {
+        if (await DeviceOrientationEvent.requestPermission() !== 'granted') return false;
+      }
+      if (!Gyro.on) { addEventListener('deviceorientation', Gyro.handle); Gyro.on = true; }
+      return true;
+    } catch (e) { return false; }
+  },
+};
+const needsGyroPermission = typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function';
+if (!needsGyroPermission && matchMedia('(pointer: coarse)').matches && !REDUCED) Gyro.enable();
+
+/* ===== Portada: Pizza El Flaco en 3D en vivo ===== */
+const f3d = $('#f3d');
+f3d.querySelector('.b3d').innerHTML = CUBE + 'Vista 3D';
+const hero = new Dish3D(document.createElement('canvas'), { amp: .055, dpr: 1.5, shine: .5 });
+if (hero.ok) {
+  f3d.insertBefore(hero.cv, f3d.firstChild);
+  hero.load(FOTOS.pz16, false).then(ok => { if (ok) { $('#f3dImg').style.transition = 'opacity .8s'; $('#f3dImg').style.opacity = 0; } });
+  hero.bindDrag(f3d, .5); Gyro.subs.add(hero);
+  new IntersectionObserver(es => es.forEach(e => (e.isIntersecting && viewer.hidden) ? hero.start() : hero.stop())).observe(f3d);
+}
+f3d.addEventListener('click', () => { if (!hero.lastMoved) openViewer('pz16'); });
+f3d.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openViewer('pz16'); } });
+
+/* ===== Visor 3D a pantalla completa ===== */
+const viewer = $('#viewer'), vStage = $('#vStage');
+const LIST = MENU.flatMap(c => c.items.filter(it => FOTOS[it.id]).map(it => ({ it, cat: c })));
+const v3d = new Dish3D($('#vCanvas'), { amp: .07, dpr: 2, shine: .6 });
+if (v3d.ok) { v3d.bindDrag(vStage); Gyro.subs.add(v3d); } else { $('#vCanvas').hidden = true; $('#vImg').hidden = false; }
+let vIdx = 0, lastFocus = null;
+function vPrice(it) {
+  if (it.s) { const i = SIZES.findIndex(s => s[0] === size); return `<small>${SIZES[i][1]}</small>${money(it.s[i])}`; }
+  if (it.v) return `<small>Desde</small>${money(Math.min(...it.v.map(x => x[2])))}`;
+  return `<small>Precio</small>${money(it.p)}`;
+}
+function showDish(i, dir = 0) {
+  vIdx = (i + LIST.length) % LIST.length;
+  const { it, cat } = LIST[vIdx];
+  const info = $('#vInfo'); info.classList.add('swap');
+  setTimeout(() => {
+    $('#vCat').textContent = cat.name + (it.no ? ' · Nº ' + it.no : '');
+    $('#vTitle').textContent = (cat.id === 'pizzas' && it.id !== 'pz15' ? 'Pizza ' : cat.id === 'pastas' && it.id !== 'pa1' ? 'Pasta ' : '') + it.n;
+    $('#vDesc').textContent = it.d || '';
+    $('#vPrice').innerHTML = vPrice(it);
+    $('#vAddWrap').innerHTML = `<button type="button" class="add" data-add="${it.id}" aria-label="Agregar ${esc(it.n)}">${PLUS}<span>Agregar</span></button>`;
+    $('#vCount').textContent = `${vIdx + 1} / ${LIST.length}`;
+    info.classList.remove('swap');
+  }, dir ? 180 : 0);
+  $('#vLoad').classList.remove('off');
+  const base = FOTOS[it.id];
+  if (v3d.ok) v3d.load(base, true).then(ok => ok && $('#vLoad').classList.add('off')).catch(() => $('#vLoad').classList.add('off'));
+  else { const im = $('#vImg'); im.onload = () => $('#vLoad').classList.add('off'); im.src = base + '.webp'; im.alt = it.n; }
+  // precarga el siguiente
+  const nx = LIST[(vIdx + 1) % LIST.length].it.id; [FOTOS[nx] + '.webp', FOTOS[nx] + '-d.webp'].forEach(u => { const p = new Image(); p.src = u; });
+}
+function openViewer(id) {
+  const i = LIST.findIndex(x => x.it.id === id); if (i < 0) return;
+  lastFocus = document.activeElement;
+  hero.stop && hero.stop();
+  viewer.hidden = false; document.documentElement.style.overflow = 'hidden';
+  $('#gyroBtn').hidden = !(needsGyroPermission && !Gyro.on);
+  $('#vHintTxt').textContent = Gyro.on ? 'Inclina el teléfono o arrastra el plato' : 'Arrastra el plato para girarlo';
+  showDish(i);
+  requestAnimationFrame(() => { viewer.classList.add('open'); v3d.start && v3d.start(); });
+  $('#vClose').focus();
+  if (location.hash !== '#ver-' + id) history.pushState({ v: id }, '', '#ver-' + id);
+}
+function closeViewer(fromPop) {
+  if (viewer.hidden) return;
+  viewer.classList.remove('open'); v3d.stop && v3d.stop();
+  setTimeout(() => { viewer.hidden = true; document.documentElement.style.overflow = ''; if (hero.ok && f3d.getBoundingClientRect().bottom > 0 && f3d.getBoundingClientRect().top < innerHeight) hero.start(); }, 350);
+  if (!fromPop && location.hash.startsWith('#ver-')) history.back();
+  lastFocus && lastFocus.focus && lastFocus.focus({ preventScroll: true });
+}
+addEventListener('popstate', () => { if (!location.hash.startsWith('#ver-')) closeViewer(true); });
+$('#vClose').addEventListener('click', () => closeViewer());
+$('#vPrev').addEventListener('click', () => { showDish(vIdx - 1, -1); history.replaceState({}, '', '#ver-' + LIST[vIdx].it.id); });
+$('#vNext').addEventListener('click', () => { showDish(vIdx + 1, 1); history.replaceState({}, '', '#ver-' + LIST[vIdx].it.id); });
+$('#gyroBtn').addEventListener('click', async () => { if (await Gyro.enable()) { $('#gyroBtn').hidden = true; $('#vHintTxt').textContent = 'Inclina el teléfono o arrastra el plato'; } });
+addEventListener('keydown', e => {
+  if (viewer.hidden) return;
+  if (e.key === 'Escape') { e.stopImmediatePropagation(); closeViewer(); }
+  if (e.key === 'ArrowRight') $('#vNext').click();
+  if (e.key === 'ArrowLeft') $('#vPrev').click();
+}, true);
+vStage.addEventListener('pointerdown', () => { v3d.dragging = true; });
+addEventListener('pointerup', () => { v3d.dragging = false; hero.dragging = false; });
+f3d.addEventListener('pointerdown', () => { hero.dragging = true; });
+document.addEventListener('click', e => { const ph = e.target.closest('[data-view]'); if (ph) openViewer(ph.dataset.view); });
+if (location.hash.startsWith('#ver-')) { const id = location.hash.slice(5); history.replaceState({}, '', location.pathname + location.search); setTimeout(() => openViewer(id), 300); }
+
+/* ===== Movimiento de las tarjetas: aparecen en 3D y la foto se desplaza con el scroll ===== */
+if (!REDUCED && 'IntersectionObserver' in window) {
+  document.documentElement.classList.add('js-reveal');
+  const vis = new Set();
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); }
+  }), { rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.item, .dtile').forEach(el => io.observe(el));
+  const pio = new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? vis.add(e.target) : vis.delete(e.target)));
+  document.querySelectorAll('.ph').forEach(el => pio.observe(el));
+  let raf = 0;
+  const par = () => { raf = 0; const H = innerHeight; vis.forEach(el => { const r = el.getBoundingClientRect(); const p = ((r.top + r.height / 2) - H / 2) / (H / 2 + r.height / 2); el.style.setProperty('--p', Math.max(-1, Math.min(1, p)).toFixed(3)); }); };
+  addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(par); }, { passive: true });
+  par();
+}
+</script>

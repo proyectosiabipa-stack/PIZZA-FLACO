@@ -5,14 +5,6 @@
 <title>P&amp;R Flaco's Menú</title>
 <meta name="description" content="Menú digital de P&R Flaco's: pizzas, pastas, entradas, carnes, platos nuevos y bebidas.">
 <meta name="theme-color" content="#151413">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="format-detection" content="telephone=no">
-<link rel="icon" type="image/png" href="fotos/icon-180.png">
-<link rel="apple-touch-icon" href="fotos/icon-180.png">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="preload" as="image" href="fotos/pz16-m.webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;1,700;1,800;1,900&family=Figtree:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500&display=swap">
@@ -37,7 +29,6 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-[hidden] { display: none !important; }
 html { scroll-behavior: smooth; scroll-padding-top: 128px; -webkit-text-size-adjust: 100%; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
 body {
@@ -51,7 +42,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 button, input { font: inherit; color: inherit; }
-button, a, [role="button"] { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
 .wrap { max-width: 980px; margin: 0 auto; padding-inline: var(--gutter); }
@@ -239,16 +229,12 @@ section.cat { padding-block: 36px 4px; }
   background: radial-gradient(90% 60% at 50% 38%, #2a1a0f 0%, #121110 62%, #0b0a09 100%); opacity: 0; transition: opacity .35s ease; overscroll-behavior: contain; }
 .viewer[hidden] { display: none; }
 .viewer.open { opacity: 1; }
-.v-stage { position: relative; width: min(100%, 720px); height: min(60vh, 640px, 118vw); height: min(60dvh, 640px, 118vw); flex: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; cursor: grab; touch-action: none; transform: perspective(1100px) rotateX(16deg) scale(.86) translateY(30px); opacity: 0; transition: transform .8s cubic-bezier(.16,.84,.24,1), opacity .5s ease; }
+.v-stage { position: relative; width: min(100%, 62vh, 620px); aspect-ratio: 1; flex: none; cursor: grab; touch-action: none; transform: perspective(1100px) rotateX(16deg) scale(.86) translateY(30px); opacity: 0; transition: transform .8s cubic-bezier(.16,.84,.24,1), opacity .5s ease; }
 .viewer.open .v-stage { transform: none; opacity: 1; }
 .v-stage:active { cursor: grabbing; }
-.v-stage canvas, .v-stage img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
-.v-stage img, .v-stage canvas.flat { object-fit: contain; border-radius: 26px; -webkit-mask-image: radial-gradient(closest-side, #000 82%, transparent 100%); mask-image: radial-gradient(closest-side, #000 82%, transparent 100%); }
-.v-mode { position: absolute; left: 50%; top: 6px; transform: translateX(-50%); z-index: 2; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px 0 9px; border-radius: 999px; background: rgba(21,20,19,.6); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgba(247,197,34,.4); color: var(--yolk); font: 700 12px/1 var(--f-display); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .4s; }
-.v-mode.on { opacity: 1; }
-.v-mode svg { width: 15px; height: 15px; animation: cube 6s linear infinite; }
-.v-reset { position: absolute; right: 4px; bottom: 4px; z-index: 2; }
-.v-stage::after { display: none; content: ""; position: absolute; left: 12%; right: 12%; bottom: -4%; height: 10%; border-radius: 50%; background: radial-gradient(closest-side, rgba(242,135,58,.28), transparent); filter: blur(8px); z-index: -1; }
+.v-stage canvas, .v-stage img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; border-radius: 26px;
+  -webkit-mask-image: radial-gradient(closest-side, #000 82%, transparent 100%); mask-image: radial-gradient(closest-side, #000 82%, transparent 100%); }
+.v-stage::after { content: ""; position: absolute; left: 12%; right: 12%; bottom: -4%; height: 10%; border-radius: 50%; background: radial-gradient(closest-side, rgba(242,135,58,.28), transparent); filter: blur(8px); z-index: -1; }
 .v-load { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; transition: opacity .3s; }
 .v-load i { width: 38px; height: 38px; border-radius: 50%; border: 3px solid rgba(247,197,34,.2); border-top-color: var(--yolk); animation: spin .8s linear infinite; }
 .v-load.off { opacity: 0; }
@@ -270,8 +256,7 @@ section.cat { padding-block: 36px 4px; }
 .v-row .add { margin-left: 0; height: 44px; padding: 0 18px 0 14px; background: var(--ember); color: var(--ink-on-ember); border-color: var(--ember); font-size: 14px; }
 .v-hint { margin-top: 12px; font-size: 12px; color: var(--chalk-dim); display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
 .v-hint button { border: 1px solid rgba(247,197,34,.45); background: transparent; color: var(--yolk); border-radius: 999px; padding: 5px 11px; font-size: 12px; font-weight: 600; }
-@media (max-height: 700px) { .v-info p { display: none; } .v-stage { height: 54vh; height: 54dvh; } }
-.viewer { height: 100vh; height: 100dvh; }
+@media (max-height: 700px) { .v-info p { display: none; } .v-stage { width: min(100%, 54vh); } }
 .empty { padding: 48px 0; text-align: center; color: var(--chalk-dim); }
 .empty b { display: block; font: italic 800 30px/1 var(--f-display); color: var(--chalk); text-transform: uppercase; margin-bottom: 8px; }
 
@@ -370,7 +355,7 @@ footer .logo { margin-top: 22px; font: italic 900 22px/1 var(--f-display); color
   </div>
 
   <div class="feature has3d">
-    <div class="f3d" id="f3d" role="button" tabindex="0" aria-label="Ver Pizza El Flaco en 3D"><span class="b3d" aria-hidden="true"></span><img src="fotos/pz16-m.webp" alt="Pizza El Flaco" id="f3dImg" fetchpriority="high"></div>
+    <div class="f3d" id="f3d" role="button" tabindex="0" aria-label="Ver Pizza El Flaco en 3D"><span class="b3d" aria-hidden="true"></span><img src="fotos/pz16-m.webp" alt="Pizza El Flaco" id="f3dImg"></div>
     <div class="f-body">
       <div>
         <div class="tag">La de la casa</div>
@@ -401,8 +386,6 @@ footer .logo { margin-top: 22px; font: italic 900 22px/1 var(--f-display); color
   <div class="v-stage" id="vStage">
     <canvas id="vCanvas" aria-hidden="true"></canvas>
     <img id="vImg" alt="" hidden>
-    <span class="v-mode" id="vMode"></span>
-    <button class="v-btn v-reset" type="button" id="vReset" aria-label="Volver a la vista inicial"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>
     <div class="v-load" id="vLoad"><i></i></div>
   </div>
   <div class="v-info" id="vInfo">
@@ -415,7 +398,7 @@ footer .logo { margin-top: 22px; font: italic 900 22px/1 var(--f-display); color
       <span id="vAddWrap"></span>
       <button class="v-btn" type="button" id="vNext" aria-label="Plato siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></button>
     </div>
-    <div class="v-hint"><span id="vHintTxt">Arrastra para girar · pellizca para acercar · doble toque para zoom</span></div>
+    <div class="v-hint"><span id="vHintTxt">Arrastra el plato para girarlo</span><button type="button" id="gyroBtn" hidden>Mover con el teléfono</button></div>
   </div>
 </div>
 
@@ -573,7 +556,7 @@ function itemHTML(it) {
 }
 function photoHTML(it) {
   if (!FOTOS[it.id]) return '';
-  return `<button type="button" class="ph" data-view="${it.id}" aria-label="Ver ${esc(it.n)} en 3D"><img src="${esc(FOTOS[it.id])}-m.webp" srcset="${esc(FOTOS[it.id])}-s.webp 480w, ${esc(FOTOS[it.id])}-m.webp 720w" sizes="${it.cat === 'bebidas' ? '(min-width: 860px) 230px, (min-width: 620px) 31vw, 46vw' : '(min-width: 760px) 470px, 100vw'}" alt="${esc(it.n)}" loading="lazy" decoding="async" width="720" height="720" onload="this.classList.add('ok')" onerror="this.classList.add('ok')"><span class="b3d" aria-hidden="true">${CUBE}3D</span><span class="cap">${FOTO_NOTA}</span></button>`;
+  return `<button type="button" class="ph" data-view="${it.id}" aria-label="Ver ${esc(it.n)} en 3D"><img src="${esc(FOTOS[it.id])}-m.webp" alt="${esc(it.n)}" loading="lazy" decoding="async" width="720" height="720" onload="this.classList.add('ok')" onerror="this.classList.add('ok')"><span class="b3d" aria-hidden="true">${CUBE}3D</span><span class="cap">${FOTO_NOTA}</span></button>`;
 }
 function drinkHTML(it) {
   return `<div class="dtile" data-id="${it.id}" data-q="${esc(norm(it.n))}">${photoHTML(it)}<div class="row"><div><span>${esc(it.n)}</span><b>${money(it.p)}</b></div><button type="button" class="mini-add" data-add="${it.id}" aria-label="Agregar ${esc(it.n)}">${PLUS}</button></div></div>`;
@@ -837,7 +820,7 @@ if (!needsGyroPermission && matchMedia('(pointer: coarse)').matches && !REDUCED)
 
 /* ===== Portada: Pizza El Flaco en 3D en vivo ===== */
 const f3d = $('#f3d');
-f3d.querySelector('.b3d').innerHTML = CUBE + '3D · 360°';
+f3d.querySelector('.b3d').innerHTML = CUBE + 'Vista 3D';
 const hero = new Dish3D(document.createElement('canvas'), { amp: .055, dpr: 1.5, shine: .5 });
 if (hero.ok) {
   f3d.insertBefore(hero.cv, f3d.firstChild);
@@ -848,31 +831,11 @@ if (hero.ok) {
 f3d.addEventListener('click', () => { if (!hero.lastMoved) openViewer('pz16'); });
 f3d.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openViewer('pz16'); } });
 
-document.addEventListener('visibilitychange', () => { if (document.hidden) hero.stop(); else if (viewer.hidden && f3d.getBoundingClientRect().bottom > 0) hero.start(); });
 /* ===== Visor 3D a pantalla completa ===== */
 const viewer = $('#viewer'), vStage = $('#vStage');
 const LIST = MENU.flatMap(c => c.items.filter(it => FOTOS[it.id]).map(it => ({ it, cat: c })));
-/* Pizzas redondas = modelo 3D completo (360°). Resto = relieve 3D. Three.js se carga solo al abrir el visor. */
-const ROUND = new Set(['pz1','pz2','pz3','pz4','pz5','pz6','pz7','pz8','pz9','pz10','pz11','pz12','pz13','pz14','pz16','pz17','pz18','pz19']);
-let engine = null, enginePromise = null, v3d = { start() {}, stop() {}, ok: false };
-function getEngine() {
-  if (enginePromise) return enginePromise;
-  enginePromise = import('./vendor/viewer3d.js').then(m => {
-    const c = $('#vCanvas'); const t = document.createElement('canvas').getContext('webgl2');
-    if (!t) throw new Error('sin WebGL2');
-    engine = m.createViewer(c, { wood: 'fotos/wood.webp', reduced: REDUCED }); return engine;
-  }).catch(err => { // respaldo: visor de profundidad ligero
-    console.warn('Visor 3D completo no disponible:', err);
-    const c = $('#vCanvas'); const nc = c.cloneNode(); nc.classList.add('flat'); c.replaceWith(nc);
-    const fit = () => { const r = vStage.getBoundingClientRect(), s = Math.min(vStage.clientWidth, vStage.clientHeight); Object.assign(nc.style, { width: s + 'px', height: s + 'px', left: (vStage.clientWidth - s) / 2 + 'px', top: (vStage.clientHeight - s) / 2 + 'px', right: 'auto', bottom: 'auto' }); };
-    fit(); new ResizeObserver(fit).observe(vStage); $('#vReset').hidden = true;
-    v3d = new Dish3D(nc, { amp: .07, dpr: 2, shine: .6 });
-    if (v3d.ok) v3d.bindDrag(vStage); else { nc.hidden = true; $('#vImg').hidden = false; }
-    return null;
-  });
-  return enginePromise;
-}
-const MODE_TXT = { pizza: CUBE + 'Modelo 3D · 360°', relief: CUBE + 'Relieve 3D' };
+const v3d = new Dish3D($('#vCanvas'), { amp: .07, dpr: 2, shine: .6 });
+if (v3d.ok) { v3d.bindDrag(vStage); Gyro.subs.add(v3d); } else { $('#vCanvas').hidden = true; $('#vImg').hidden = false; }
 let vIdx = 0, lastFocus = null;
 function vPrice(it) {
   if (it.s) { const i = SIZES.findIndex(s => s[0] === size); return `<small>${SIZES[i][1]}</small>${money(it.s[i])}`; }
@@ -892,31 +855,28 @@ function showDish(i, dir = 0) {
     $('#vCount').textContent = `${vIdx + 1} / ${LIST.length}`;
     info.classList.remove('swap');
   }, dir ? 180 : 0);
-  $('#vLoad').classList.remove('off'); $('#vMode').classList.remove('on');
-  const base = FOTOS[it.id], kind = ROUND.has(it.id) ? 'pizza' : 'relief', done = () => $('#vLoad').classList.add('off');
-  $('#vHintTxt').textContent = kind === 'pizza' ? 'Gira la pizza por todos lados · pellizca o doble toque para acercar' : 'Arrastra para girar · pellizca o doble toque para acercar';
-  getEngine().then(eng => {
-    if (eng) return eng.show(base, kind).then(m => { if (m) { $('#vMode').innerHTML = MODE_TXT[m]; $('#vMode').classList.add('on'); done(); } });
-    if (v3d.ok) return v3d.load(base, true).then(done);
-    const im = $('#vImg'); im.onload = done; im.src = base + '.webp'; im.alt = it.n;
-  }).catch(done);
-  // precarga el siguiente plato
-  const nx = LIST[(vIdx + 1) % LIST.length].it.id, nb = FOTOS[nx];
-  (ROUND.has(nx) ? [nb + '-top.webp', nb + '-r.webp'] : [nb + '.webp', nb + '-d.webp']).forEach(u => { const p = new Image(); p.src = u; });
+  $('#vLoad').classList.remove('off');
+  const base = FOTOS[it.id];
+  if (v3d.ok) v3d.load(base, true).then(ok => ok && $('#vLoad').classList.add('off')).catch(() => $('#vLoad').classList.add('off'));
+  else { const im = $('#vImg'); im.onload = () => $('#vLoad').classList.add('off'); im.src = base + '.webp'; im.alt = it.n; }
+  // precarga el siguiente
+  const nx = LIST[(vIdx + 1) % LIST.length].it.id; [FOTOS[nx] + '.webp', FOTOS[nx] + '-d.webp'].forEach(u => { const p = new Image(); p.src = u; });
 }
 function openViewer(id) {
   const i = LIST.findIndex(x => x.it.id === id); if (i < 0) return;
   lastFocus = document.activeElement;
   hero.stop && hero.stop();
   viewer.hidden = false; document.documentElement.style.overflow = 'hidden';
+  $('#gyroBtn').hidden = !(needsGyroPermission && !Gyro.on);
+  $('#vHintTxt').textContent = Gyro.on ? 'Inclina el teléfono o arrastra el plato' : 'Arrastra el plato para girarlo';
   showDish(i);
-  requestAnimationFrame(() => { viewer.classList.add('open'); getEngine().then(eng => (eng || v3d).start()); });
+  requestAnimationFrame(() => { viewer.classList.add('open'); v3d.start && v3d.start(); });
   $('#vClose').focus();
   if (location.hash !== '#ver-' + id) history.pushState({ v: id }, '', '#ver-' + id);
 }
 function closeViewer(fromPop) {
   if (viewer.hidden) return;
-  viewer.classList.remove('open'); (engine || v3d).stop(); if (engine) setTimeout(() => viewer.hidden && engine.release(), 400);
+  viewer.classList.remove('open'); v3d.stop && v3d.stop();
   setTimeout(() => { viewer.hidden = true; document.documentElement.style.overflow = ''; if (hero.ok && f3d.getBoundingClientRect().bottom > 0 && f3d.getBoundingClientRect().top < innerHeight) hero.start(); }, 350);
   if (!fromPop && location.hash.startsWith('#ver-')) history.back();
   lastFocus && lastFocus.focus && lastFocus.focus({ preventScroll: true });
@@ -925,7 +885,7 @@ addEventListener('popstate', () => { if (!location.hash.startsWith('#ver-')) clo
 $('#vClose').addEventListener('click', () => closeViewer());
 $('#vPrev').addEventListener('click', () => { showDish(vIdx - 1, -1); history.replaceState({}, '', '#ver-' + LIST[vIdx].it.id); });
 $('#vNext').addEventListener('click', () => { showDish(vIdx + 1, 1); history.replaceState({}, '', '#ver-' + LIST[vIdx].it.id); });
-$('#vReset').addEventListener('click', () => engine && engine.reset());
+$('#gyroBtn').addEventListener('click', async () => { if (await Gyro.enable()) { $('#gyroBtn').hidden = true; $('#vHintTxt').textContent = 'Inclina el teléfono o arrastra el plato'; } });
 addEventListener('keydown', e => {
   if (viewer.hidden) return;
   if (e.key === 'Escape') { e.stopImmediatePropagation(); closeViewer(); }
@@ -933,19 +893,11 @@ addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') $('#vPrev').click();
 }, true);
 vStage.addEventListener('pointerdown', () => { v3d.dragging = true; });
-vStage.addEventListener('gesturestart', e => e.preventDefault()); // iOS: que el pellizco haga zoom al plato, no a la página
 addEventListener('pointerup', () => { v3d.dragging = false; hero.dragging = false; });
 f3d.addEventListener('pointerdown', () => { hero.dragging = true; });
 document.addEventListener('click', e => { const ph = e.target.closest('[data-view]'); if (ph) openViewer(ph.dataset.view); });
 if (location.hash.startsWith('#ver-')) { const id = location.hash.slice(5); history.replaceState({}, '', location.pathname + location.search); setTimeout(() => openViewer(id), 300); }
 
-/* Precarga discreta del motor 3D cuando la página ya cargó (no si el cliente activó ahorro de datos) */
-addEventListener('load', () => {
-  const sd = navigator.connection && (navigator.connection.saveData || /2g/.test(navigator.connection.effectiveType || ''));
-  if (sd) return;
-  const go = () => import('./vendor/viewer3d.js').catch(() => {});
-  'requestIdleCallback' in window ? requestIdleCallback(() => setTimeout(go, 1500), { timeout: 5000 }) : setTimeout(go, 3500);
-});
 /* ===== Movimiento de las tarjetas: aparecen en 3D y la foto se desplaza con el scroll ===== */
 if (!REDUCED && 'IntersectionObserver' in window) {
   document.documentElement.classList.add('js-reveal');
